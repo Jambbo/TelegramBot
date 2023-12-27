@@ -2,13 +2,17 @@ package org.example.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.example.dao.AppDocumentDAO;
 import org.example.dao.AppUserDAO;
 import org.example.dao.RawDataDAO;
+import org.example.entity.AppDocument;
 import org.example.entity.AppUser;
 import org.example.entity.RawData;
-import org.example.entity.enums.UserState;
+import org.example.exceptions.UploadFileException;
+import org.example.service.FileService;
 import org.example.service.MainService;
 import org.example.service.ProducerService;
+import org.example.service.enums.ServiceCommand;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,7 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import static org.example.entity.enums.UserState.BASIC_STATE;
 import static org.example.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
-import static org.example.service.enums.ServiceCommands.*;
+import static org.example.service.enums.ServiceCommand.*;
 
 @Log4j
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class MainServiceImpl implements MainService {
     private final RawDataDAO rawDataDAO;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
+    private final FileService fileService;
 
     @Override
     public void processTextMessage(Update update) {
@@ -34,7 +39,8 @@ public class MainServiceImpl implements MainService {
         var text = update.getMessage().getText();
         var output = "";
 
-        if(CANCEL.equals(text)){
+        var serviceCommand = ServiceCommand.fromValue(text);
+        if(CANCEL.equals(serviceCommand)){
             output = cancelProcess(appUser);
         }else if(BASIC_STATE.equals(userState)){
             output = processServiceCommand(appUser, text);
@@ -57,9 +63,16 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        //TODO добавить сохранения документа
-        var answer = "Документ успешно загружен! Ссылка для скачивания: https://test.com/get-doc/777";
-        sendAnswer(answer, chatId);
+        try{
+            AppDocument doc = fileService.processDoc(update.getMessage());
+            //TODO Добавить генерацию ссылки для скачивания документа
+  var answer = "Документ успешно загружен! Ссылка для скачивания: https://test.com/get-doc/777";
+            sendAnswer(answer, chatId);
+        }catch (UploadFileException e){
+            log.error(e);
+            String error = "К сожалению, загрузка файла не удалась. Повторите попытку позже.";
+            sendAnswer(error,chatId);
+        }
     }
 
     @Override
