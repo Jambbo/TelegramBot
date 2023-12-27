@@ -10,6 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>node</module>
+        <module>common-jpa</module>
     </modules>
 
 
