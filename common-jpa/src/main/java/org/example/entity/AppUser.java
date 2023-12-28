@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(exclude = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "app_user")
+@Table(name = "app_document")
 @Entity
 public class AppUser {
     @Id

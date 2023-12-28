@@ -2,7 +2,9 @@ package org.example.entity;
 
 import lombok.*;
 import javax.persistence.*;
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

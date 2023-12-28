@@ -6,6 +6,7 @@ import org.example.dao.AppDocumentDAO;
 import org.example.dao.AppUserDAO;
 import org.example.dao.RawDataDAO;
 import org.example.entity.AppDocument;
+import org.example.entity.AppPhoto;
 import org.example.entity.AppUser;
 import org.example.entity.RawData;
 import org.example.exceptions.UploadFileException;
@@ -83,10 +84,16 @@ public class MainServiceImpl implements MainService {
         if(isNotAllowToSendContent(chatId,appUser)){
             return;
         }
-
-        //TODO добавить сохранения фото
-        var answer = "Фото успешно загружено! Ссылка для скачивания: https://test.com/get-photo/777";
-        sendAnswer(answer, chatId);
+        try{
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            //TODO Добавить генерацию ссылки для скачивания документа
+            var answer = "Фото успешно загружен! Ссылка для скачивания: https://test.com/get-photo/777";
+            sendAnswer(answer, chatId);
+        }catch (UploadFileException e){
+            log.error(e);
+            String error = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
+            sendAnswer(error,chatId);
+        }
     }
 
     private boolean isNotAllowToSendContent(Long chatId, AppUser appUser) {
