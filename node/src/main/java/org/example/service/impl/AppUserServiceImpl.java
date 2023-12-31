@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j;
 import org.example.dao.AppUserDAO;
@@ -19,17 +20,16 @@ import javax.mail.internet.InternetAddress;
 import static org.example.entity.enums.UserState.BASIC_STATE;
 import static org.example.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
 @Log4j
+@RequiredArgsConstructor
 @Service
 public class AppUserServiceImpl implements AppUserService {
+
     private final AppUserDAO appUserDAO;
+
     private final CryptoTool cryptoTool;
     @Value("${service.mail.uri}")
     private String mailServiceUri;
 
-    public AppUserServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool) {
-        this.appUserDAO = appUserDAO;
-        this.cryptoTool = cryptoTool;
-    }
 
     @Override
     public String registerUser(AppUser appUser){
@@ -48,7 +48,7 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String setEmail(AppUser appUser, String email){
         try{
-            InternetAddress emailAddr = new InternetAddress(email);
+            var emailAddr = new InternetAddress(email);
             emailAddr.validate();
         } catch (AddressException e) {
             return "Введите, пожалуйста, корректный email. Для отмены команды введите /cancel";

@@ -4,8 +4,6 @@ package org.example.controller;
 import lombok.extern.log4j.Log4j;
 import org.example.service.UpdateProducer;
 import org.example.utils.MessageUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Controller;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -14,12 +12,12 @@ import static org.example.model.RabbitQueue.*;
 
 @Controller
 @Log4j
-public class UpdateController {
+public class UpdateProcessor {
     private TelegramBot telegramBot;
     private final MessageUtils messageUtils;
     private final UpdateProducer updateProducer;
 
-    public UpdateController(MessageUtils messageUtils, UpdateProducer updateProducer) {
+    public UpdateProcessor(MessageUtils messageUtils, UpdateProducer updateProducer) {
         this.messageUtils = messageUtils;
         this.updateProducer=updateProducer;
     }
